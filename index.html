@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>犬型人格研究所 | Doggie Lab</title>
+
+    <style>
+       /* 確保最高優先級，強制縮小裝飾圖 */
+.opt-item .opt-deco.small-deco {
+    width: 50px !important;
+    top: -20px !important;
+}
+
+/* 手機版強制縮小 */
+@media (max-width: 768px) {
+    .opt-item .opt-deco.small-deco {
+        width: 42px !important;
+        top: -15px !important;
+    }
+}
+        /* 💡 核心設定：正式向網頁註冊你上傳的字體檔案 */
+        @font-face {
+            font-family: "DoggyFont"; 
+            src: url("./小狗內文說明.ttf") format("truetype"); 
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --bg: #FDF5E6;
+            --primary: #EF9A53;
+            --secondary: #A8C69F;
+            --text: #8B5E3C;
+            --white: #FFFFFF;
+            --btn-bg: #FAD7A0; 
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        body, html { 
+            color: var(--text); 
+            font-family: "DoggyFont", "PingFang TC", "Microsoft JhengHei", sans-serif; 
+            overflow-x: hidden; /* 強制隱藏網頁底層的多餘寬度，徹底防堵跑版 */
+            max-width: 100vw;
+            min-height: 100vh; 
+        }
+
+        /* 獨立背景層 */
+        .bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh; 
+            background-image: url('bg.png'); 
+            background-repeat: no-repeat;
+            background-position: center top;
+            background-size: cover;  
+            z-index: -1;             
+            pointer-events: none;    
+        }
+
+        #app { 
+            width: 100%; 
+            position: relative; 
+            z-index: 10; 
+            overflow-x: hidden; /* 將整個 APP 範圍鎖死，確保安全 */
+        }
+
+        .view-screen { 
+            width: 100%; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 40px 20px; 
+            animation: pageIn 0.5s ease forwards; 
+        }
+
+        @keyframes pageIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+
+        .hidden { display: none !important; }
+
+        /* --- 圓圈進度條樣式 --- */
+        .ball-row { display: flex; gap: 10px; }
+        .ball { width: 38px; height: 38px; border-radius: 50%; background: #E6E0D4; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #AAA; transition: 0.3s; }
+        .ball.active { background: var(--primary); color: white; transform: scale(1.15); }
+        .ball.done { background: #C2B6A1; color: white; }
+
+        /* --- 首頁排版 --- */
+        .home-screen { padding-top: 10px !important; }
+        .header-top { width: 100%; max-width: 1200px; display: flex; justify-content: center; align-items: center; padding: 10px 20px 0px 20px; }
+        .brand-logo-img { height: 240px; width: auto; object-fit: contain; vertical-align: middle; margin-bottom: 0; }
+        
+        .hero-illustration-stage { text-align: center; margin-top: -15px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 550px; position: relative; }
+        .hero-title-img { width: 100%; height: auto; object-fit: contain; margin-top: 0; margin-bottom: 0; position: relative; z-index: 5; }
+
+        .dogs-container { position: relative; width: 100%; aspect-ratio: 1.5; margin-top: -5px; margin-bottom: 35px; z-index: 10; }
+        .stage-dog { position: absolute; height: auto; object-fit: contain; pointer-events: none; transition: transform 0.3s ease; }
+
+        .dog-chowchow { width: 21%; left: 40%; top: 0%; z-index: 10; }
+        .dog-samoyed { width: 26%; left: 9%; top: 12%; z-index: 15; }
+        .dog-bordercollie { width: 25%; right: 10%; top: 13%; z-index: 15; }
+        .dog-chihuahua { width: 19%; left: 27%; top: 38%; z-index: 20; }
+        .dog-dachshund { width: 23%; right: 28%; top: 37%; z-index: 20; }
+        .dog-labrador { width: 23%; left: 16%; top: 62%; z-index: 24; }
+        .dog-taiwanese { width: 23%; right: 16%; top: 63%; z-index: 24; }
+        .dog-corgi { width: 22%; left: 39%; top: 66%; z-index: 25; }
+
+        .btn-cta { position: relative; background-color: #e5974b; border: 3.5px solid #7c4a1b; color: white; padding: 13px 55px; border-radius: 50px; cursor: pointer; font-size: 26px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 6px 0px #7c4a1b; transition: all 0.1s ease; margin-top: 0px; user-select: none; outline: none; z-index: 40; }
+        .btn-cta::before { content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 2px dashed #fce3c5; border-radius: 44px; pointer-events: none; }
+        .btn-cta:hover { background-color: #ed9f54; }
+        .hero-illustration-stage:hover .stage-dog { transform: translateY(-3px); }
+        .btn-cta:active { transform: translateY(4px); box-shadow: 0 2px 0px #7c4a1b; }
+        .paw-svg { width: 26px; height: 26px; fill: white; display: inline-block; vertical-align: middle; }
+
+        /* --- 測驗說明看板 --- */
+        .notice-section { width: 100%; max-width: 800px; text-align: center; padding-top: 40px; margin: 0 auto; }
+        .notice-card { background: white; padding: 45px 50px; border-radius: 30px; box-shadow: 0 10px 35px rgba(139, 94, 60, 0.05); text-align: left; border: 1.5px solid #F0EBE3; position: relative; overflow: hidden; }
+        .notice-text-wrapper { max-width: 72%; font-size: 18px; line-height: 1.9; color: var(--text); font-weight: 500; }
+        .notice-text-wrapper p { margin-bottom: 12px; }
+        .notice-text-wrapper p:last-child { margin-bottom: 0; }
+        .notice-dog-img { position: absolute; right: 20px; bottom: -5px; width: 165px; height: auto; object-fit: contain; pointer-events: none; }
+
+        /* 📱 行動裝置最佳化排版 */
+        @media (max-width: 768px) {
+            .notice-card { padding: 35px 25px; }
+            .notice-text-wrapper { max-width: 100%; margin-bottom: 120px; font-size: 16px; }
+            .notice-dog-img { width: 120px; right: 10px; bottom: -5px; }
+            .brand-logo-img { height: 170px; }
+            .header-top { padding: 10px 10px 0px 10px; }
+            .hero-illustration-stage { margin-top: -10px; max-width: 98%; }
+            .dogs-container { margin-bottom: 30px; } 
+            .btn-cta { font-size: 22px; padding: 10px 40px; margin-top: 0px; }
+            
+            .quiz-nav { flex-direction: column; align-items: center; gap: 15px; width: 100%; }
+            .quiz-nav > span:first-child { display: block; width: 100%; text-align: left; padding: 8px 0; font-size: 16px; font-weight: bold; }
+            .quiz-nav .ball-row { width: 100%; justify-content: space-between; gap: 4px; }
+            .ball { width: 32px; height: 32px; font-size: 13px; }
+            
+            .result-box { padding: 30px 20px !important; }
+            .opt-item { padding: 18px !important; margin: 20px 0 !important; }
+            
+            /* 手機版裝飾微調尺寸 */
+            .opt-deco { width: 55px !important; top: -18px !important; } 
+        }
+
+        /* --- 測驗頁面布局 --- */
+        .quiz-nav { width: 100%; max-width: 600px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+        .result-box { background: white; width: 100%; max-width: 550px; border-radius: 40px; padding: 50px 30px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.03); position: relative; }
+        .q-header-box { height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 10px; }
+        #tag { display: inline-block; background: #FFF0E0; color: var(--primary); padding: 6px 20px; border-radius: 25px; font-size: 18px; font-weight: 900; margin-bottom: 20px; min-height: 32px; letter-spacing: 1px; }
+        #qtext { line-height: 1.6; font-size: 24px; font-weight: bold; width: 100%; min-height: 80px; display: flex; align-items: center; justify-content: center; text-align: center; }
+
+        /* 🎯 選項樣式 */
+        .opt-item { 
+            position: relative; 
+            width: 100%; 
+            background: white; 
+            border: 1.5px solid #F0EBE3; 
+            padding: 22px; 
+            margin: 26px 0; /* 留出空間給裝飾 */
+            border-radius: 20px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            transition: 0.3s; 
+            text-align: left; 
+        }
+
+        .opt-item:hover { background: var(--primary); color: var(--bg); transform: translateX(10px); border-color: var(--primary); }
+        .opt-item.selected { background: var(--primary); color: var(--bg); border-color: var(--primary); font-weight: bold; }
+        
+        .opt-label { width: 34px; height: 34px; background: #FDEBD0; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: bold; flex-shrink: 0; }
+        .opt-item.selected .opt-label { background: white; color: var(--primary); }
+
+        /* 🎯 實體圖片裝飾樣式 (完美適配你切好的小圖檔) */
+        .opt-deco {
+            position: absolute;
+            top: -24px;             
+            width: 65px;            
+            height: auto;
+            pointer-events: none;
+            z-index: 5;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0px 3px 6px rgba(0,0,0,0.06)); 
+        }
+        
+        .deco-left { left: -10px; transform-origin: bottom left; }
+        .deco-right { right: -10px; transform-origin: bottom right; }
+
+        .opt-item:hover .opt-deco {
+            transform: scale(1.18) rotate(-4deg);
+        }
+
+        /* --- 控制列與按鈕樣式 --- */
+        .quiz-controls { display: flex; justify-content: space-between; width: 100%; margin-top: 30px; padding-top: 15px; border-top: 1px dashed #F0EBE3; min-height: 55px; }
+        .btn-nav { background-color: var(--btn-bg); color: var(--text); border: 1.5px solid rgba(139, 94, 60, 0.3); padding: 10px 28px; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.04); }
+        .btn-nav:hover:not(.disabled) { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(139, 94, 60, 0.15); background-color: #F8C471; }
+        .btn-nav:active:not(.disabled) { transform: translateY(1px); }
+        .btn-nav.disabled { opacity: 0.4; cursor: not-allowed; background-color: #E6E0D4; color: #999; border-color: #CCC; }
+        .btn-nav.hidden-btn { visibility: hidden; }
+
+        /* --- 分析與結果頁佈局 --- */
+        .res-img-container { width: 220px; height: 220px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
+        .res-img-container img { width: 100%; height: 100%; object-fit: contain; }
+        @keyframes run-towards { 0% { transform: scale(0.7); } 50% { transform: scale(1.1) translateY(-15px); } 100% { transform: scale(0.7); } }
+        .running-dog { font-size: 110px; animation: run-towards 0.6s infinite ease-in-out; margin-bottom: 30px; }
+        .loading-paw { font-size: 24px; opacity: 0.3; }
+
+        .coord-system { background: #FFF9F2; border-radius: 25px; padding: 35px 20px 25px; margin: 25px 0; position: relative; }
+        .axis-label { position: absolute; font-size: 12px; font-weight: bold; color: #BCB4A7; }
+        .label-top { top: 12px; left: 50%; transform: translateX(-50%); }
+        .label-bottom { bottom: 12px; left: 50%; transform: translateX(-50%); }
+        .label-left { top: 50%; left: 10px; transform: translateY(-50%) rotate(-90deg); }
+        .label-right { top: 50%; right: 10px; transform: translateY(-50%) rotate(90deg); }
+        .coord-grid { width: 220px; height: 160px; border: 1.5px solid #E6E0D4; margin: 15px auto; position: relative; background: white; }
+        .axis-x { width: 100%; height: 1.5px; background: #E6E0D4; position: absolute; top: 50%; left: 0; }
+        .axis-y { width: 1.5px; height: 100%; background: #E6E0D4; position: absolute; left: 50%; top: 0; }
+        .dot { width: 14px; height: 14px; background: var(--primary); border-radius: 50%; position: absolute; transform: translate(-50%, -50%); transition: 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10; box-shadow: 0 0 10px rgba(239, 154, 83, 0.6); }
+
+        footer { margin-top: 100px; padding: 60px 0; text-align: center; font-size: 14px; opacity: 0.6; width: 100%; border-top: 1px solid rgba(139, 94, 60, 0.1); }
+    </style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+
+<div id="app">
+    <section id="p1" class="view-screen home-screen">
+        <div class="header-top">
+            <img src="./犬型人格研究所.PNG" class="brand-logo-img" alt="犬型人格研究所">
+        </div>
+        
+        <div class="hero-illustration-stage">
+            <img src="./找出你的狗型人格.PNG" class="hero-title-img" alt="找出你的狗型人格">
+            
+            <div class="dogs-container">
+                <img src="./薩摩耶.PNG" class="stage-dog dog-samoyed" alt="薩摩耶">
+                <img src="./鬆獅.PNG" class="stage-dog dog-chowchow" alt="鬆獅">
+                <img src="./邊境牧羊犬.PNG" class="stage-dog dog-bordercollie" alt="邊境牧羊犬">
+                <img src="./吉娃娃.PNG" class="stage-dog dog-chihuahua" alt="吉娃娃">
+                <img src="./台灣土狗.PNG" class="stage-dog dog-taiwanese" alt="台灣土狗">
+                <img src="./拉布拉多.PNG" class="stage-dog dog-labrador" alt="拉布拉多">
+                <img src="./臘腸狗.PNG" class="stage-dog dog-dachshund" alt="臘腸狗">
+                <img src="./杜賓.PNG" class="stage-dog dog-corgi" alt="柯基位置">
+            </div>
+
+            <button class="btn-cta" onclick="router.go(2)">
+                <span>開始測驗</span>
+            </button>
+        </div>
+        
+        <div class="notice-section" id="features">
+            <div class="notice-card">
+                <div class="notice-text-wrapper">
+                    <p>今天一整天，你就是最可愛的狗狗！一起搖著尾巴、興奮地衝出家門，探索神祕的路線，過上快樂的一天！</p>
+                    <p>在旅途中，我遇到好多好玩又糾結的選擇題，請憑著你的第一直覺幫我做決定！等我們回家時，就能揭曉你的靈靈魂裡到底藏著哪一隻可愛的狗狗性格啦！</p>
+                    <p><strong>預備——我們出發囉，衝啊！🐕✨</strong></p>
+                </div>
+                <img src="./臘腸狗.PNG" class="notice-dog-img" alt="臘腸狗">
+            </div>
+        </div>
+        
+        <footer>犬型人格研究所 © 2026</footer>
+    </section>
+
+    <section id="p2" class="view-screen hidden">
+        <div class="quiz-nav">
+            <span onclick="router.go(1)" style="cursor:pointer; opacity:0.6;">← 返回首頁</span>
+            <div class="ball-row" id="balls"></div>
+            <span id="counter" style="opacity:0.6;">1 / 8</span>
+        </div>
+        <div class="result-box">
+            <div class="q-header-box">
+                <span id="tag"></span>
+                <h2 id="qtext"></h2>
+            </div>
+            
+            <div id="opts"></div>
+            
+            <div class="quiz-controls">
+                <button id="btn-prev" class="btn-nav" onclick="router.prev()">← 上一題</button>
+                <button id="btn-next" class="btn-nav disabled" onclick="router.next()">下一題 →</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="p3" class="view-screen hidden" style="text-align: center; justify-content: center;">
+        <h2 style="font-size:32px; margin-bottom:40px;">正在分析你的狗狗人格中...</h2>
+        <div class="running-dog">🐕</div>
+        <div style="display: flex; gap: 8px; justify-content: center;">
+            <span class="loading-paw">🐾</span>
+            <span class="loading-paw">🐾</span>
+            <span class="loading-paw">🐾</span>
+            <span class="loading-paw">🐾</span>
+        </div>
+    </section>
+
+    <section id="p4" class="view-screen hidden">
+        <div class="result-box" style="padding-top: 40px;">
+            <div id="res-img" class="res-img-container"></div>
+            <p style="color:var(--primary); font-weight:bold;">你的狗狗人格化身是</p>
+            <h1 id="res-name" style="font-size: 42px; margin: 5px 0; font-weight: 900;"></h1>
+            <p id="res-sub" style="font-size:16px; opacity:0.8; margin-bottom:15px; font-weight: bold; color: var(--text);"></p>
+            <div id="res-tags"></div>
+            <p id="res-desc" style="text-align:left; font-size:14px; line-height:1.8; margin-top: 25px;"></p>
+            <div class="coord-system">
+                <span class="axis-label label-top">感性</span>
+                <span class="axis-label label-bottom">理性</span>
+                <span class="axis-label label-left">不親人</span>
+                <span class="axis-label label-right">親人</span>
+                <div class="coord-grid"><div class="axis-x"></div><div class="axis-y"></div><div id="dot" class="dot"></div></div>
+            </div>
+            <button class="btn-cta" style="width:100%; justify-content:center; background:var(--secondary); border:none; box-shadow: none; transform: none; min-height: auto;" onclick="location.reload()">再測一次</button>
+        </div>
+    </section>
+</div>
+
+<script>
+    // 🎨 16 張裝飾圖檔設定區 🎨
+    // 已經幫你排好順序，確保大、小物件以及左、右方向能均勻交錯出現！
+    const decoList = [
+        { file: '城堡.png', align: 'left' },
+        { file: '草.png', align: 'right' },
+        { file: '雲朵1.png', align: 'left' },
+        { file: '樹屋.png', align: 'right' },
+        { file: '花草.png', align: 'left' },
+        { file: '骨頭.png', align: 'right' },
+        { file: '樹.png', align: 'left' },
+        { file: '雲朵2.png', align: 'right' },
+        { file: '花草2.png', align: 'left' },
+        { file: '花草3.png', align: 'right' },
+        { file: '花草4.png', align: 'left' },
+        { file: '草2.png', align: 'right' },
+        { file: '花草5.png', align: 'left' },
+        { file: '花草6.png', align: 'right' },
+        { file: '花草7.png', align: 'left' },
+        { file: '花草8.png', align: 'right' }
+    ];
+
+    const questions = [
+        { t: "第一題", q: "走著走著發現主人今天走跟平常不同的路", x: "y", o: ["繼續跟著主人走", "很抗拒，拉著主人想走原本常走的路", "很焦慮，待在原地不走，猶豫很久才跟著主人走"] },
+        { t: "第二題", q: "路邊突然出現一顆球", x: "y", o: ["完全不理，直接離開", "聞一聞氣味，但不想玩", "馬上跑過去把球叼走"] },
+        { t: "第三題", q: "要去公園的路上，主人竟然迷路了", x: "y", o: ["待在原地等主人", "急著想走原路回去", "聞路上的氣味，拉著主人到公園"] },
+        { t: "第四題", q: "到公園了，主人拿出新的益智玩具給小狗本人玩", x: "y", o: ["從主人包包翻出舊玩具，不想玩新的玩具", "玩玩看，但一下就膩了", "很感興趣，想找出破解玩具的方法"] },
+        { t: "第五題", q: "公園很多人在遛狗，一旁的小朋友想摸摸我", x: "x", o: ["搖搖尾巴給他摸", "不理小朋友，不想給他摸", "聞一下小朋友的氣味，然後離開"] },
+        { t: "第六題", q: "在公園玩的途中，主人遇到熟識的朋友，開始聊了起來", x: "x", o: ["跑走到其他地方亂逛", "跑到主人朋友旁邊，舔主人朋友的腳", "在主人身邊繞來繞去，想要主人回來陪他玩，不願接觸其他人"] },
+        { t: "第七題", q: "要回家了，沿途路上經過地瓜店，老闆很熱情的招呼", x: "x", o: ["撲上去討好老闆，想討個地瓜吃", "經過不理老闆", "在老闆身邊聞一聞就離開"] },
+        { t: "第八題", q: "快到家了，在家門口遇到隔壁鄰居，主人跟他打個招呼", x: "x", o: ["開心地撲上去跟鄰居打招呼", "看都不看直接回家", "湊上去聞一聞"] }
+    ];
+
+    const dogList = [
+    { name: "薩摩耶", sub: "微笑棉花糖", tags: ["白色快樂發電機", "笑容融化全場"], img: "薩摩耶.PNG", tx: 4, ty: 4 },
+    { name: "拉不拉多", sub: "快樂外送員", tags: ["笑容親切派", "人見人愛小太陽"], img: "拉布拉多.PNG", tx: 2, ty: 2 },
+    { name: "吉娃娃", sub: "小小一隻大大存在感", tags: ["情緒雷達啟動", "迷你but不好惹"], img: "吉娃娃.PNG", tx: -4, ty: 4 },
+    { name: "臘腸狗", sub: "狗界短腿代表", tags: ["可愛比例失控", "腿短志氣高"], img: "臘腸狗.PNG", tx: -4, ty: 0.5 },
+    { name: "台灣土狗", sub: "巷口故事王", tags: ["樸實帥氣派", "低調但很有料"], img: "台灣土狗.PNG", tx: 0, ty: 0 },
+    // 杜賓：保持在最極端的 $(-4, -4)$
+    { name: "杜賓", sub: "狗界保鑣", tags: ["氣場滿分", "冷酷外表安全感滿滿"], img: "杜賓.PNG", tx: -4, ty: -4 },
+    { name: "邊牧", sub: "狗界學霸", tags: ["智商180++", "聰明到有點忙"], img: "邊境牧羊犬.PNG", tx: 4, ty: -4 },
+    // 鬆獅：將 x 軸從 -4 改為 -1.5，將它從「極度獨立」區移開，讓它成為「中等獨立」
+    { name: "鬆獅", sub: "毛茸茸小獅子", tags: ["可愛but有距離", "站著不動也很可愛"], img: "鬆獅.PNG", tx: -1.5, ty: -2.5 }
+];
+
+    const router = {
+        step: 0, sx: 0, sy: 0, history: [], tempSelectedIdx: null,
+
+        go(p) {
+            document.querySelectorAll('.view-screen').forEach(v => v.classList.add('hidden'));
+            document.getElementById(`p${p}`).classList.remove('hidden');
+            if(p === 1) this.resetQuiz();
+            if(p === 2) this.initQuiz();
+            if(p === 3) this.startLoading();
+            window.scrollTo(0, 0);
+        },
+
+        resetQuiz() {
+            this.step = 0; 
+            this.sx = 0; 
+            this.sy = 0; 
+            this.history = []; 
+            this.tempSelectedIdx = null;
+        },
+
+       initQuiz() {
+    const ballBox = document.getElementById('balls');
+    ballBox.innerHTML = questions.map((_, i) => {
+        const isClickable = i <= this.history.length;
+        const statusClass = i === this.step ? 'active' : (i < this.step ? 'done' : '');
+        const clickAttr = isClickable ? `onclick="router.jumpTo(${i})"` : "";
+        const styleAttr = isClickable ? `style="cursor:pointer;"` : `style="cursor:not-allowed; opacity:0.3;"`;
+        return `<div class="ball ${statusClass}" ${clickAttr} ${styleAttr}>${i < this.step ? '✓' : i + 1}</div>`;
+    }).join('');
+    
+    const q = questions[this.step];
+    document.getElementById('tag').innerText = q.t;
+    document.getElementById('qtext').innerText = q.q;
+    document.getElementById('counter').innerText = `${this.step + 1} / 8`;
+    
+    const optBox = document.getElementById('opts');
+    
+    // 🎯 修改處：判斷條件改為 (step 3 或 5) 且 (選項索引 i 為 1，即 B 選項)
+    optBox.innerHTML = q.o.map((o, i) => {
+        const decoIdx = (this.step * 3 + i) % decoList.length;
+        const d = decoList[decoIdx];
+        const alignClass = d.align === 'right' ? 'deco-right' : 'deco-left';
+        
+        // 只有在第 4 題 (index 3) 與 第 6 題 (index 5) 的 B 選項 (index 1) 才套用
+        const sizeClass = ((this.step === 3 || this.step === 5) && i === 1) ? 'small-deco' : '';
+
+        return `
+            <div id="opt-${i}" class="opt-item" onclick="router.selectOpt(${i})">
+                <img src="./${d.file}" class="opt-deco ${alignClass} ${sizeClass}" alt="裝飾">
+                <div class="opt-label">${String.fromCharCode(65+i)}</div>
+                ${o}
+            </div>
+        `;
+    }).join('');
+    
+    const prevBtn = document.getElementById('btn-prev');
+    const nextBtn = document.getElementById('btn-next');
+    
+    this.tempSelectedIdx = null; 
+    nextBtn.classList.add('disabled'); 
+
+    if (this.step === 0) {
+        prevBtn.classList.add('hidden-btn'); 
+    } else {
+        prevBtn.classList.remove('hidden-btn');
+    }
+},
+
+        selectOpt(i) {
+            document.querySelectorAll('.opt-item').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`opt-${i}`).classList.add('selected');
+            
+            this.tempSelectedIdx = i; 
+            document.getElementById('btn-next').classList.remove('disabled'); 
+        },
+
+        next() {
+            if (this.tempSelectedIdx === null) return; 
+            const i = this.tempSelectedIdx;
+            const v = i === 0 ? 1 : (i === 1 ? 0 : -1);
+            const axis = this.step < 4 ? 'y' : 'x';
+            
+            this.history.push({ axis: axis, value: v, selectedIdx: i });
+            if(axis === 'y') this.sy += v; else this.sx += v;
+            
+            this.step++;
+            if(this.step < 8) this.initQuiz(); else this.go(3);
+        },
+
+        prev() {
+            if (this.step > 0) {
+                this.step--;
+                const lastScore = this.history.pop();
+                if (lastScore.axis === 'y') this.sy -= lastScore.value; else this.sx -= lastScore.value;
+                this.initQuiz();
+            }
+        },
+
+        jumpTo(targetStep) {
+            if (targetStep === this.step) return;
+            while (this.step > targetStep) {
+                const lastScore = this.history.pop();
+                if (lastScore.axis === 'y') this.sy -= lastScore.value; else this.sx -= lastScore.value;
+                this.step--;
+            }
+            this.initQuiz();
+        },
+
+        startLoading() {
+            const paws = document.querySelectorAll('.loading-paw');
+            paws.forEach((p, i) => { 
+                p.classList.remove('active'); 
+                setTimeout(() => p.classList.add('active'), i * 600); 
+            });
+            setTimeout(() => this.showResult(), 3000);
+        },
+
+        showResult() {
+            this.go(4);
+            let match = dogList[0]; 
+            let min = 100;
+            
+            dogList.forEach(d => {
+                let dist = Math.sqrt(Math.pow(this.sx - d.tx, 2) + Math.pow(this.sy - d.ty, 2));
+                if(dist < min) { min = dist; match = d; }
+            });
+           
+            document.getElementById('res-name').innerText = match.name;
+            document.getElementById('res-sub').innerText = `「${match.sub}」`;
+            document.getElementById('res-desc').innerText = `你在小狗一日冒險中的選擇反映出你擁有「${match.name}」般的性格特質。這代表你在處事與面對未知環境時，傾向於${this.sy >= 0 ? "感性與直覺" : "理性與邏輯"}，且在群體互動中表現出${this.sx >= 0 ? "親人" : "獨立"}的一面。`;
+            document.getElementById('res-img').innerHTML = `<img src="./${match.img}" alt="${match.name}">`;
+            
+            document.getElementById('res-tags').innerHTML = match.tags.map(t => 
+                `<span class="tag-pill" style="display:inline-block; padding:5px 14px; background:var(--secondary); color:white; border-radius:20px; margin:4px; font-size:13px; font-weight:bold;">#${t}</span>`
+            ).join('');
+           
+            const dot = document.getElementById('dot');
+            dot.style.left = (50 + (this.sx * 11)) + '%';
+            dot.style.top = (50 - (this.sy * 11)) + '%';
+
+            const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSezflhsdlR6Uu1fOHpof3RWuR44Q1kwgJEH3Uq4Iw17fpQPGg/formResponse";
+            const formData = new FormData();
+            formData.append("entry.1335030725", this.sx);       
+            formData.append("entry.1097251494", this.sy);       
+            formData.append("entry.1671559072", match.name);    
+
+            fetch(formURL, { 
+                method: "POST", 
+                mode: "no-cors", 
+                body: formData 
+            })
+            .then(() => { console.log("🐾 填答統計已成功傳送到 Google 表單！"); })
+            .catch((error) => { console.error("🐾 傳送統計資料失敗：", error); });
+        }
+    };
+
+    window.onload = function() { router.go(1); };
+</script>
+</body>
+</html>
